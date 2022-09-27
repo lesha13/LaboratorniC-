@@ -10,8 +10,8 @@ namespace Employee
     {
         public class Employee
         {
-            protected double id;
-            public double Id { get { return id; } set { id = value; } }
+            protected int id;
+            public int Id { get { return id; } set { id = value; } }
             // { get; set; } в цьому випадку не працює тому що атрибут повертає інший атрибут
 
             protected string name;
