@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Toy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <name>aaa</name>
+  <price>12</price>
+  <age>
+    <int>1</int>
+    <int>2</int>
+  </age>
+</Toy>

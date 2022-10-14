@@ -1,0 +1,8 @@
+C:\Users\Льоша\source\repos\ToysXML\bin\Debug\ToysXML.exe.config
+C:\Users\Льоша\source\repos\ToysXML\bin\Debug\ToysXML.exe
+C:\Users\Льоша\source\repos\ToysXML\bin\Debug\ToysXML.pdb
+C:\Users\Льоша\source\repos\ToysXML\obj\Debug\ToysXML.csproj.AssemblyReference.cache
+C:\Users\Льоша\source\repos\ToysXML\obj\Debug\ToysXML.csproj.SuggestedBindingRedirects.cache
+C:\Users\Льоша\source\repos\ToysXML\obj\Debug\ToysXML.csproj.CoreCompileInputs.cache
+C:\Users\Льоша\source\repos\ToysXML\obj\Debug\ToysXML.exe
+C:\Users\Льоша\source\repos\ToysXML\obj\Debug\ToysXML.pdb
