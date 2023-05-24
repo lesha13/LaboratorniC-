@@ -1,94 +1,40 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Security.Permissions;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Services;
+using WebApplication1.Models;
+using WebApplication1.Models.Requests;
+using NuGet.Protocol.Plugins;
 
 namespace WebApplication1.Controllers
-{   
-    [Route("api/[controller]")]
+{
     [ApiController]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
-        public static User user = new User();
-        public readonly IConfiguration _configuration;
-        public AuthController(IConfiguration configuration) 
+        private readonly IAuthService service;
+
+        public AuthController(IAuthService service)
         {
-            _configuration = configuration;
+            this.service = service;
         }
 
-        [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(UserDto request)
+        [Route("api/auth/login/{identityType}")]
+        [HttpPost]
+        public IActionResult Login(string identityType, [FromBody] LoginRequest body)
         {
-            CreatePassportHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            var user = service.Authenticate(identityType, body.Identity, body.Secret);
 
-            user.Username = request.Username;
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-            return Ok(user);
-        }
-
-        [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(UserDto request)
-        {
-            if (user.Username != request.Username)
+            if (user == null)
             {
-                return BadRequest("User not found");
+                return Unauthorized(new Response()
+                {
+                    Status = 401
+                });
             }
 
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            return Ok(new Response()
             {
-                return BadRequest("Wrong password");
-            }
-            
-            string token = CreateToken(user);
-            return Ok(token);
-        }
-        
-        private string CreateToken(User user) 
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username)
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value
-            ));
-
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: cred
-            );
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
-                
-
-        private void CreatePassportHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512()) 
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt) 
-        {
-            using (var hmac = new HMACSHA512(user.PasswordSalt))
-            {
-                var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computeHash.SequenceEqual(passwordHash);
-            }
+                Status = 200,
+                Data = user
+            });
         }
     }
 }
